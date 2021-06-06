@@ -63,6 +63,7 @@ namespace Terraria.ModLoader.IO
 			RawToTexture2D(graphicsDevice, new BinaryReader(src, Encoding.UTF8));
 
 		public static void RawToPng(Stream src, Stream dst) {
+			// TODO: use SDL directly
 			using (var img = RawToTexture2D(Main.instance.GraphicsDevice, src))
 				img.SaveAsPng(dst, img.Width, img.Height);
 		}

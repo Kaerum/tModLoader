@@ -877,6 +877,14 @@
  			}
  
  			for (int n = 0; n < 1001; n++) {
+@@ -8304,6 +_,7 @@
+ 		}
+ 
+ 		private void OnceFailedLoadingAnAsset(string assetPath, Exception e) {
++			Logging.Terraria.Error($"Failed to load asset: \"{assetPath}\"", e);
+ 			FancyErrorPrinter.ShowFailedToLoadAssetError(e, assetPath);
+ 		}
+ 
 @@ -8331,7 +_,7 @@
  				audioSystem = new DisabledAudioSystem();
  
@@ -3616,18 +3624,20 @@
  			if (!_isDrawingOrUpdating && IsGraphicsDeviceAvailable) {
  				_isDrawingOrUpdating = true;
  				EnsureRenderTargetContent();
-@@ -46923,6 +_,11 @@
+@@ -46921,7 +_,13 @@
+ 					Main.OnPostDraw(gameTime);
+ 
  				Assets.TransferCompletedAssets();
++				ModContent.TransferCompletedAssets();
  				_isDrawingOrUpdating = false;
- 			}
++			}
 +			}
 +			catch (Exception e) {
 +				Logging.Terraria.Error(e);
 +				throw;
-+			}
+ 			}
  		}
  
- 		private void DoDraw(GameTime gameTime) {
 @@ -47227,8 +_,8 @@
  			UpdateAtmosphereTransparencyToSkyColor();
  			base.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);

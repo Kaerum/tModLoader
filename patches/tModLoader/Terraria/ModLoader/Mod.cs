@@ -16,6 +16,7 @@ using System.Linq;
 using Terraria.ModLoader.Config;
 using ReLogic.Content;
 using Terraria.ModLoader.Assets;
+using ReLogic.Content.Sources;
 
 namespace Terraria.ModLoader
 {
@@ -60,7 +61,9 @@ namespace Terraria.ModLoader
 		/// </summary>
 		public string DisplayName { get; internal set; }
 
-		public ModAssetRepository Assets { get; private set; }
+		public AssetRepository Assets { get; private set; }
+
+		public IContentSource RootContentSource { get; private set; }
 
 		internal short netID = -1;
 		public bool IsNetSynced => netID >= 0;
@@ -155,7 +158,7 @@ namespace Terraria.ModLoader
 			if (!loading)
 				throw new Exception("AddEquipTexture can only be called from Mod.Load or Mod.Autoload");
 
-			ModContent.GetTexture(texture); //ensure texture exists
+			ModContent.GetTexture(texture, AssetRequestMode.AsyncLoad); //ensure texture exists
 
 			equipTexture.Texture = texture;
 			equipTexture.Mod = this;
@@ -174,7 +177,7 @@ namespace Terraria.ModLoader
 				else {
 					EquipLoader.femaleTextures[slot] = item.FemaleTexture;
 				}
-				ModContent.GetTexture(item.ArmTexture); //ensure texture exists
+				ModContent.GetTexture(item.ArmTexture, AssetRequestMode.AsyncLoad); //ensure texture exists
 				EquipLoader.armTextures[slot] = item.ArmTexture;
 			}
 
@@ -432,32 +435,17 @@ namespace Terraria.ModLoader
 		/// <returns></returns>
 		public bool FileExists(string name) => File != null && File.HasFile(name);
 
-		/// <summary>
-		/// Shorthand for calling ModContent.GetTexture(this.FileName(name)).
-		/// </summary>
-		/// <exception cref="MissingResourceException"></exception>
-		public Asset<Texture2D> GetTexture(string name) => Assets.Request<Texture2D>(name);
+		public bool HasAsset(string assetName) => RootContentSource.HasAsset(assetName);
 
-		/// <summary>
-		/// Shorthand for calling ModLoader.TextureExists(this.FileName(name)).
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <returns></returns>
-		public bool TextureExists(string name) => Assets.HasAsset<Texture2D>(name);
+		public bool RequestAssetIfExists<T>(string assetName, out Asset<T> asset) where T : class {
+			if (!HasAsset(assetName)) {
+				asset = default;
+				return false;
+			}
 
-		/// <summary>
-		/// Shorthand for calling ModContent.GetSound(this.FileName(name)).
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <returns></returns>
-		/// <exception cref="MissingResourceException"></exception>
-		public Asset<SoundEffect> GetSound(string name) => Assets.Request<SoundEffect>(name);
-		/// <summary>
-		/// Shorthand for calling ModLoader.SoundExists(this.FileName(name)).
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <returns></returns>
-		public bool SoundExists(string name) => Assets.HasAsset<SoundEffect>(name);
+			asset = Assets.Request<T>(assetName);
+			return true;
+		}
 
 		/// <summary>
 		/// Shorthand for calling ModContent.GetMusic(this.FileName(name)).
@@ -478,28 +466,6 @@ namespace Terraria.ModLoader
 		/// <param name="name">The name.</param>
 		/// <returns></returns>
 		public bool MusicExists(string name) => musics.ContainsKey(name);
-
-		/// <summary>
-		/// Gets a SpriteFont loaded from the specified path.
-		/// </summary>
-		/// <exception cref="MissingResourceException"></exception>
-		public Asset<DynamicSpriteFont> GetFont(string name) => Assets.Request<DynamicSpriteFont>(name);
-
-		/// <summary>
-		/// Used to check if a custom SpriteFont exists
-		/// </summary>
-		public bool FontExists(string name) => Assets.HasAsset<DynamicSpriteFont>(name);
-
-		/// <summary>
-		/// Gets an Effect loaded from the specified path.
-		/// </summary>
-		/// <exception cref="MissingResourceException"></exception>
-		public Asset<Effect> GetEffect(string name) => Assets.Request<Effect>(name);
-
-		/// <summary>
-		/// Used to check if a custom Effect exists
-		/// </summary>
-		public bool EffectExists(string name) => Assets.HasAsset<Effect>(name);
 
 		/// <summary>
 		/// Used for weak inter-mod communication. This allows you to interact with other mods without having to reference their types or namespaces, provided that they have implemented this method.

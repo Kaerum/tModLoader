@@ -18,6 +18,7 @@ using ReLogic.Content.Readers;
 using ReLogic.OS;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
+using ReLogic.Utilities;
 
 namespace Terraria.ModLoader.UI
 {
@@ -70,15 +71,12 @@ namespace Terraria.ModLoader.UI
 
 			if (_mod.modFile.HasFile("icon.png")) {
 				try {
-					using (var reader = new PngReader(Main.instance.GraphicsDevice))
 					using (_mod.modFile.Open())
 					using (var s = _mod.modFile.GetStream("icon.png")) {
-						Asset<Texture2D> modIconTexture = ModLoader.ManifestAssets.CreateUntrackedAsset(
-							$"Terraria.ModLoader.UI.Browser.{_mod.Name}.icon.png",
-							reader.FromStream<Texture2D>(s)
-						);
-						if (modIconTexture.Width() == 80 && modIconTexture.Height() == 80) {
-							_modIcon = new UIImage(modIconTexture) {
+						var iconTexture = Main.instance.Services.Get<AssetReaderCollection>().Read<Texture2D>(s, ".png");
+
+						if (iconTexture.Width == 80 && iconTexture.Height == 80) {
+							_modIcon = new UIImage(iconTexture) {
 								Left = { Percent = 0f },
 								Top = { Percent = 0f }
 							};

@@ -36,7 +36,7 @@ namespace Terraria.ModLoader.Engine
 
 			mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
-			AssetRepository.SafelyAcquireResourceLock = Enter;
+			//AssetRepository.SafelyAcquireResourceLock = Enter;
 			Main.OnPostDraw += _ => RunGLActions();
 
 			// NOTE! Whole class currently useless without hooking every function in FNA3D

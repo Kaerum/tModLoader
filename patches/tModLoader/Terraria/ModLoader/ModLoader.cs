@@ -106,17 +106,8 @@ namespace Terraria.ModLoader
 				return;
 			}
 
-			var assetReaderCollection = AssetInitializer.assetReaderCollection;
-
-			var asyncAssetLoader = new AsyncAssetLoader(assetReaderCollection, 20);
-			asyncAssetLoader.RequireTypeCreationOnTransfer(typeof(Texture2D));
-			asyncAssetLoader.RequireTypeCreationOnTransfer(typeof(DynamicSpriteFont));
-			asyncAssetLoader.RequireTypeCreationOnTransfer(typeof(SpriteFont));
-
-			var assetLoader = new AssetLoader(assetReaderCollection);
-
 			ManifestContentSource = new AssemblyResourcesContentSource(Assembly.GetExecutingAssembly());
-			ManifestAssets = new ModAssetRepository(assetReaderCollection, assetLoader, asyncAssetLoader, new[] { ManifestContentSource });
+			ManifestAssets = new ModAssetRepository(AssetInitializer.assetReaderCollection, new[] { ManifestContentSource });
 		}
 
 		internal static void BeginLoad(CancellationToken token) => Task.Run(() => Load(token));

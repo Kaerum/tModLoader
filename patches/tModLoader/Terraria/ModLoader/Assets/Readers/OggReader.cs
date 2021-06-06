@@ -8,9 +8,9 @@ using Terraria.ModLoader.Audio;
 
 namespace Terraria.ModLoader.Assets
 {
-	public class OggReader : IAssetReader, IDisposable
+	public class OggReader : IAssetReader
 	{
-		public T FromStream<T>(Stream stream) where T : class {
+		protected T FromStream<T>(Stream stream) where T : class {
 			if (typeof(T) != typeof(SoundEffect))
 				throw AssetLoadException.FromInvalidReader<OggReader, T>();
 
@@ -24,11 +24,5 @@ namespace Terraria.ModLoader.Assets
 
 			return new SoundEffect(buffer, reader.SampleRate, (AudioChannels)reader.Channels) as T;
 		}
-
-		public void Dispose() {
-
-		}
-
-		public Type[] GetAssociatedTypes() => new[] { typeof(SoundEffect) };
 	}
 }
